@@ -25,7 +25,6 @@ const getProductById = async (id) => {
   }
 };
 
-// Nueva función para crear productos
 const createProduct = async (title, price, category) => {
   try {
     const response = await fetch(API_URL, {
@@ -36,13 +35,28 @@ const createProduct = async (title, price, category) => {
       },
       body: JSON.stringify({
         title,
-        price: Number(price), // Aseguramos que sea un número
+        price: Number(price),
         category
       })
     });
     if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
     const newProduct = await response.json();
     console.log("Producto creado con éxito:", newProduct);
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+};
+
+// NUEVA FUNCIÓN PARA ELIMINAR
+const deleteProduct = async (id) => {
+  try {
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: "DELETE",
+      headers
+    });
+    if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+    const result = await response.json();
+    console.log("Producto eliminado con éxito:", result);
   } catch (error) {
     console.error("Error:", error.message);
   }
@@ -58,4 +72,9 @@ if (method === "GET") {
 } else if (method === "POST" && resource === "products") {
   const [title, price, category] = params;
   createProduct(title, price, category);
+} else if (method === "DELETE" && resource && resource.startsWith("products/")) {
+  const id = resource.split("/")[1];
+  deleteProduct(id);
+} else {
+  console.log("Comando no reconocido o parámetros incorrectos.");
 }
